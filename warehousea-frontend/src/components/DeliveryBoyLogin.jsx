@@ -1,7 +1,7 @@
 import React, { useState, useContext } from 'react';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
-import { AuthContext } from '../AuthContext'; // Adjust the path as needed
+import { Link, useNavigate } from 'react-router-dom';
+import { AuthContext } from '../AuthContext';
 
 const DeliveryBoyLogin = () => {
   const [username, setUsername] = useState('');
@@ -10,123 +10,176 @@ const DeliveryBoyLogin = () => {
   const navigate = useNavigate();
   const { login } = useContext(AuthContext);
 
-  const handleSubmit = async (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
-
-    // Client-side validation
-    if (username.trim() === '' || password.trim() === '') {
-      setError('Username and password are required.');
-      return;
-    }
-
     try {
       const response = await axios.post('http://localhost:8000/api/accounts/deliveryboy/login/', { username, password });
-      console.log('Response data:', response.data); // Print the response data
-    
-      const { token, deliveryboy } = response.data;
-    
-      if (token && deliveryboy) {
-        console.log(`Token: ${token}`); // Debug log
-        console.log(`Username: ${username}`); // Debug log
-    
-        localStorage.setItem('token', token); // Save the token in localStorage
-        login(token); // Call the login function from AuthContext
-    
-        navigate('/deliveryboy/dashboard'); // Navigate to the delivery boy dashboard
+      const { token } = response.data;
+  
+      if (token) {
+        // Store the token in localStorage
+        localStorage.setItem('token', token);
+        navigate('/deliveryboy/dashboard');
       } else {
-        console.error('Login error: Token or is_delivery_boy missing'); // Error if token or is_delivery_boy are not present
-        setError('Login failed. Please check your credentials.');
+        setError('Invalid credentials. Please try again.');
       }
     } catch (err) {
-      console.error('Login error:', err);
-      setError('Login failed. Please check your credentials.');
+      setError('Invalid credentials. Please try again.');
     }
-    
   };
+  
+  
 
-  return (
-    <div style={styles.container}>
-      <div style={styles.formContainer}>
-        <h2 style={styles.title}>Delivery Boy Login</h2>
-        <form onSubmit={handleSubmit} style={styles.form}>
-          <div style={styles.formGroup}>
-            <label style={styles.label}>Username:</label>
-            <input
-              type="text"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              style={styles.input}
-            />
-          </div>
-          <div style={styles.formGroup}>
-            <label style={styles.label}>Password:</label>
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              style={styles.input}
-            />
-          </div>
-          {error && <p style={styles.error}>{error}</p>}
-          <button type="submit" style={styles.button}>Login</button>
-        </form>
-      </div>
-    </div>
-  );
-};
-
-const styles = {
-  container: {
+  // Inline Styles
+  const pageStyle = {
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
-    height: '100vh',
-    background: 'url("https://i.pinimg.com/736x/1e/83/f4/1e83f4ed6caea6a580e1c623f90a2b2f.jpg") no-repeat center center fixed',
-    backgroundSize: 'cover',
-  },
-  formContainer: {
-    backgroundColor: 'rgba(255, 255, 255, 0.9)',
-    padding: '20px',
-    borderRadius: '8px',
-    boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
-  },
-  title: {
-    marginBottom: '20px',
-    fontSize: '24px',
-    textAlign: 'center',
-  },
-  form: {
+    minHeight: '100vh',
+    backgroundColor: '#1c1c1c',
+  };
+
+  const containerStyle = {
+    position: 'relative',
+    width: '750px',
+    height: '450px',
+    border: '2px solid #FFD700', // Yellow border
+    boxShadow: '0 0 25px #FFD700', // Yellow shadow
+    overflow: 'hidden',
     display: 'flex',
+    backgroundColor: '#25252b', // Dark background for the form
+  };
+
+  const formBoxStyle = {
+    position: 'absolute',
+    top: '0',
+    width: '50%',
+    height: '100%',
+    display: 'flex',
+    justifyContent: 'center',
     flexDirection: 'column',
-  },
-  formGroup: {
-    marginBottom: '15px',
-  },
-  label: {
-    marginBottom: '5px',
-    fontSize: '16px',
-  },
-  input: {
+    padding: '0 40px',
+  };
+
+  const infoContentStyle = {
+    position: 'absolute',
+    top: '0',
+    height: '100%',
+    width: '50%',
+    display: 'flex',
+    justifyContent: 'center',
+    flexDirection: 'column',
+    padding: '0 60px 20px 150px',
+    right: '0',
+    textAlign: 'right',
+    color: '#fff',
+  };
+
+  const h2Style = {
+    fontSize: '32px',
+    marginBottom: '20px',
+    color: '#fff',
+  };
+
+  const inputStyle = {
     width: '100%',
     padding: '10px',
-    border: '1px solid #ccc',
-    borderRadius: '4px',
-    fontSize: '16px',
-  },
-  error: {
-    color: 'red',
-    marginBottom: '15px',
-    fontSize: '14px',
-  },
-  button: {
-    padding: '10px 15px',
+    borderRadius: '5px',
     border: 'none',
-    borderRadius: '4px',
-    backgroundColor: '#007BFF',
+    borderBottom: '2px solid #fff',
+    background: 'transparent',
     color: '#fff',
     fontSize: '16px',
+    marginBottom: '20px',
+  };
+
+  const inputFocusStyle = {
+    borderBottom: '2px solid #FFD700', // Yellow underline on focus
+  };
+
+  const buttonStyle = {
+    width: '100%',
+    padding: '10px',
+    borderRadius: '5px',
+    backgroundColor: '#FFD700', // Yellow button
+    color: '#000',
+    fontWeight: '600',
+    fontSize: '16px',
+    border: 'none',
     cursor: 'pointer',
-  },
+  };
+
+  const errorStyle = {
+    color: 'red',
+    marginTop: '10px',
+  };
+
+  const pStyle = {
+    fontSize: '16px',
+    color: '#fff',
+  };
+
+  const linkStyle = {
+    color: '#FFD700', // Yellow link color
+    textDecoration: 'none',
+    marginTop: '10px',
+    display: 'block',
+    textAlign: 'center',
+  };
+
+  return (
+    <div style={pageStyle}>
+      <div style={containerStyle}>
+        {/* Login Form */}
+        <div style={formBoxStyle}>
+          <h2 style={h2Style}>Login</h2>
+          <form onSubmit={handleLogin}>
+            <div>
+              <input
+                type="text"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                required
+                placeholder="Username"
+                style={inputStyle}
+                onFocus={(e) => (e.target.style.borderBottom = inputFocusStyle.borderBottom)}
+                onBlur={(e) => (e.target.style.borderBottom = inputStyle.borderBottom)}
+              />
+            </div>
+            <div>
+              <input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                placeholder="Password"
+                style={inputStyle}
+                onFocus={(e) => (e.target.style.borderBottom = inputFocusStyle.borderBottom)}
+                onBlur={(e) => (e.target.style.borderBottom = inputStyle.borderBottom)}
+              />
+            </div>
+            <button type="submit" style={buttonStyle}>
+              Login
+            </button>
+            {error && <p style={errorStyle}>{error}</p>}
+
+            {/* Link to Delivery Boy Registration */}
+            <Link to="/deliveryboy/register" style={linkStyle}>
+              New member? Register
+            </Link>
+          </form>
+        </div>
+
+        {/* Welcome Back Section */}
+        <div style={infoContentStyle}>
+          <h2 style={h2Style}>WELCOME BACK!</h2>
+          <p style={pStyle}>We are happy to have you with us again. If you need anything, we are here to help.</p>
+          <p><a href="/admin/login" style={{fontWeight:"bold",color:"#FFD700",marginLeft:"100px",textDecoration:"none"}}>Admin</a></p>
+          <p><a href="/customer/login" style={{fontWeight:"bold",color:"#FFD700",marginLeft:"100px",textDecoration:"none"}}>Customer</a></p>
+        </div>
+      </div>
+    </div>
+  );
 };
 
 export default DeliveryBoyLogin;

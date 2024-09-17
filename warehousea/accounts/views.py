@@ -45,6 +45,26 @@ from .serializers import  DeliveryBoyProfileSerializer
 from .serializers import UserSerializer
 from rest_framework.permissions import IsAdminUser
 
+from rest_framework import generics
+from rest_framework.permissions import IsAdminUser
+from .models import CustomUser
+from .serializers import UserSerializer
+
+class CustomerListView(generics.ListAPIView):
+    queryset = CustomUser.objects.filter(is_staff=False, is_delivery_boy=False)
+    serializer_class = UserSerializer
+    permission_classes = [IsAdminUser]
+
+
+
+class DeliveryBoyListView(generics.ListAPIView):
+    serializer_class = DeliveryBoyProfileSerializer
+    permission_classes = [IsAdminUser]
+
+    def get_queryset(self):
+        return DeliveryBoy.objects.filter(is_delivery=True)
+
+
 class AdminUserManagementView(APIView):
     permission_classes = [IsAdminUser]
 
@@ -58,15 +78,23 @@ class AdminUserManagementView(APIView):
             user = CustomUser.objects.get(pk=pk)
         except CustomUser.DoesNotExist:
             return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
-        
-        serializer = UserSerializer(user, data=request.data, partial=True)
-        if serializer.is_valid():
-            serializer.save()
+
+        data = request.data
+        if 'is_active' in data:
+            user.is_active = data['is_active']
+            user.save()
+            serializer = UserSerializer(user)
             return Response(serializer.data)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        
+        return Response({'error': 'Invalid data'}, status=status.HTTP_400_BAD_REQUEST)
 
 
-
+@permission_classes([IsAdminUser])
+@api_view(['GET'])
+def admin_user_list_view(request):
+    users = CustomUser.objects.all()
+    user_data = [{'id': user.id, 'username': user.username, 'email': user.email} for user in users]
+    return Response(user_data)
 
 
 
@@ -114,8 +142,28 @@ class DeliveryBoyRegisterView(generics.CreateAPIView):
     permission_classes = [AllowAny]
 
 
-class DeliveryBoyLoginView(ObtainAuthToken):
-    serializer_class = DeliveryBoyLoginSerializer
+# class DeliveryBoyLoginView(ObtainAuthToken):
+#     serializer_class = DeliveryBoyLoginSerializer
+
+#     def post(self, request, *args, **kwargs):
+#         serializer = self.serializer_class(data=request.data, context={'request': request})
+#         if serializer.is_valid():
+#             user = serializer.validated_data['user']
+#             if not user.is_active:
+#                 return Response({'error': 'User is inactive'}, status=status.HTTP_403_FORBIDDEN)
+#             token, created = Token.objects.get_or_create(user=user)
+#             return Response({
+#                 'token': token.key,
+#                 'deliveryboy': True,
+#             })
+#         else:
+#             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+
+class Login(ObtainAuthToken):
+    # serializer_class = DeliveryBoyLoginSerializer
+    serializer_class= LoginSerializer
 
     def post(self, request, *args, **kwargs):
         serializer = self.serializer_class(data=request.data, context={'request': request})
@@ -126,12 +174,11 @@ class DeliveryBoyLoginView(ObtainAuthToken):
             token, created = Token.objects.get_or_create(user=user)
             return Response({
                 'token': token.key,
-                'deliveryboy': True,
+                'deliveryboy': user.is_delivery_boy,
+                'admin': user.is_staff,
             })
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
 
 
 
@@ -153,32 +200,30 @@ class CustomerProfileView(APIView):
 class CustomerRegisterView(generics.CreateAPIView):
     queryset = CustomUser.objects.all()
     serializer_class = CustomerRegistrationSerializer
+    permission_classes = [AllowAny]
 
 
 
 
 logger = logging.getLogger(__name__)
 
-class CustomerLoginView(ObtainAuthToken):
-    serializer_class = LoginSerializer
+# class CustomerLoginView(ObtainAuthToken):
+#     serializer_class = LoginSerializer
+    
+#     def post(self, request, *args, **kwargs):
+#         serializer = self.serializer_class(data=request.data, context={'request': request})
+#         serializer.is_valid(raise_exception=True)
+#         user = serializer.validated_data['user']
+        
+#         if not user.is_active:
+#             return Response({'error': 'Your account is inactive. Please contact support.'}, status=status.HTTP_403_FORBIDDEN)
+        
+#         token, created = Token.objects.get_or_create(user=user)
+#         return Response({
+#             'token': token.key,
+#             'is_customer': True,
+#         })
 
-    def post(self, request, *args, **kwargs):
-        serializer = self.serializer_class(data=request.data, context={'request': request})
-        serializer.is_valid(raise_exception=True)
-        user = serializer.validated_data['user']
-        
-        logger.debug(f'User authenticated: {user.username}')
-        
-        if not user.is_active:
-            logger.warning(f'Inactive user attempted login: {user.username}')
-            return Response({'error': 'User is inactive'}, status=status.HTTP_403_FORBIDDEN)
-        
-        token, created = Token.objects.get_or_create(user=user)
-        logger.debug(f'Token generated: {token.key}')
-        return Response({
-            'token': token.key,
-            'is_customer': True,
-        })
 
 
 
@@ -187,11 +232,14 @@ class AdminLogin(ObtainAuthToken):
         serializer = self.serializer_class(data=request.data, context={'request': request})
         serializer.is_valid(raise_exception=True)
         user = serializer.validated_data['user']
+        if not user.is_staff:
+            return Response({'error': 'User is not an admin'}, status=status.HTTP_403_FORBIDDEN)
         token, created = Token.objects.get_or_create(user=user)
         return Response({
             'token': token.key,
             'is_admin': user.is_staff,
         })
+
 
 class LoginSerializer(serializers.Serializer):
     username = serializers.CharField()
@@ -252,11 +300,6 @@ def admin_login_view(request):
     else:
         return Response({'error': 'Invalid credentials or not an admin'}, status=400)
 
-@permission_classes([IsAdminUser])
-@api_view(['GET'])
-def admin_user_list_view(request):
-    users = CustomUser.objects.all()
-    user_data = [{'id': user.id, 'username': user.username, 'email': user.email} for user in users]
-    return Response(user_data)
+
 
 

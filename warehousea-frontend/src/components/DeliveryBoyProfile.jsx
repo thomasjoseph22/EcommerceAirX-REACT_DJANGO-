@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import DeliveryBoyNavbar from './DeliveryBoyNavbar';
 
 const DeliveryBoyProfile = () => {
   const [profile, setProfile] = useState(null);
@@ -88,127 +89,216 @@ const DeliveryBoyProfile = () => {
   };
 
   if (loading) {
-    return <p>Loading profile...</p>;
+    return <p style={styles.loading}>Loading profile...</p>;
   }
 
   if (!profile) {
-    return <p>Profile not found.</p>;
+    return <p style={styles.loading}>Profile not found.</p>;
   }
 
   return (
     <div style={styles.container}>
+      <DeliveryBoyNavbar />
+      <div style={styles.curvedShape}></div>
+      <div style={styles.curvedShape2}></div>
       <h2 style={styles.title}>Delivery Boy Profile</h2>
-      {!isEditing ? (
-        <div>
-          <p><strong>Username:</strong> {profile.username}</p>
-          <p><strong>Email:</strong> {profile.email}</p>
-          <p><strong>PAN Card:</strong> {profile.pan_card}</p>
-          
-          <button style={styles.button} onClick={() => setIsEditing(true)}>
-            Edit Profile
-          </button>
-          <button style={styles.button} onClick={() => navigate('/deliveryboy/dashboard')}>
-            Back to Dashboard
-          </button>
-        </div>
-      ) : (
-        <form onSubmit={handleSubmit} style={styles.form}>
-          <div style={styles.formGroup}>
-            <label style={styles.label}>Username:</label>
-            <input
-              type="text"
-              name="username"
-              value={formData.username}
-              onChange={handleChange}
-              style={styles.input}
-              required
-            />
+      <div style={styles.imageContainer}>
+        <img
+          src="https://w7.pngwing.com/pngs/178/595/png-transparent-user-profile-computer-icons-login-user-avatars-thumbnail.png"
+          alt="Profile"
+          style={styles.image}
+        />
+      </div>
+      <div style={styles.content}>
+        {!isEditing ? (
+          <div style={styles.profileInfo}>
+            <p><strong>Username:</strong> {profile.username}</p>
+            <p><strong>Email:</strong> {profile.email}</p>
+            <p><strong>PAN Card:</strong> {profile.pan_card}</p>
+            <button style={styles.button} onClick={() => setIsEditing(true)}>
+              Edit Profile
+            </button>
+            <button style={styles.button} onClick={() => navigate('/deliveryboy/dashboard')}>
+              Back to Dashboard
+            </button>
           </div>
-          <div style={styles.formGroup}>
-            <label style={styles.label}>Email:</label>
-            <input
-              type="email"
-              name="email"
-              value={formData.email}
-              onChange={handleChange}
-              style={styles.input}
-              required
-            />
-          </div>
-          <div style={styles.formGroup}>
-            <label style={styles.label}>PAN Card:</label>
-            <input
-              type="text"
-              name="pan_card"
-              value={formData.pan_card}
-              onChange={handleChange}
-              style={styles.input}
-              required
-            />
-          </div>
-          <div style={styles.formGroup}>
-            <label style={styles.label}>Old Password:</label>
-            <input
-              type="password"
-              name="old_password"
-              value={formData.old_password}
-              onChange={handleChange}
-              style={styles.input}
-            />
-          </div>
-          <div style={styles.formGroup}>
-            <label style={styles.label}>New Password:</label>
-            <input
-              type="password"
-              name="new_password"
-              value={formData.new_password}
-              onChange={handleChange}
-              style={styles.input}
-            />
-          </div>
-          {error && <p style={styles.error}>{error}</p>}
-          <button type="submit" style={styles.button}>Save Changes</button>
-          <button type="button" style={styles.button} onClick={() => setIsEditing(false)}>
-            Cancel
-          </button>
-        </form>
-      )}
+        ) : (
+          <form onSubmit={handleSubmit} style={styles.form}>
+            <div style={styles.formGroup}>
+              <label style={styles.label}>Username:</label>
+              <input
+                type="text"
+                name="username"
+                value={formData.username}
+                onChange={handleChange}
+                style={styles.input}
+                required
+              />
+            </div>
+            <div style={styles.formGroup}>
+              <label style={styles.label}>Email:</label>
+              <input
+                type="email"
+                name="email"
+                value={formData.email}
+                onChange={handleChange}
+                style={styles.input}
+                required
+              />
+            </div>
+            <div style={styles.formGroup}>
+              <label style={styles.label}>PAN Card:</label>
+              <input
+                type="text"
+                name="pan_card"
+                value={formData.pan_card}
+                onChange={handleChange}
+                style={styles.input}
+                required
+              />
+            </div>
+            <div style={styles.formGroup}>
+              <label style={styles.label}>Old Password:</label>
+              <input
+                type="password"
+                name="old_password"
+                value={formData.old_password}
+                onChange={handleChange}
+                style={styles.input}
+              />
+            </div>
+            <div style={styles.formGroup}>
+              <label style={styles.label}>New Password:</label>
+              <input
+                type="password"
+                name="new_password"
+                value={formData.new_password}
+                onChange={handleChange}
+                style={styles.input}
+              />
+            </div>
+            {error && <p style={styles.error}>{error}</p>}
+            <button type="submit" style={styles.button}>
+              Save Changes
+            </button>
+            <button type="button" onClick={() => setIsEditing(false)} style={styles.button}>
+              Cancel
+            </button>
+          </form>
+        )}
+      </div>
     </div>
   );
 };
 
 const styles = {
   container: {
+    position: 'relative',
+    width: '100vw',
+    height: '100vh',
+    border: '2px solid #ff2770',
+    boxShadow: '0 0 25px #ff2770',
+    overflow: 'auto',
+    backgroundColor: '#25252b',
+    borderRadius: '10px',
     padding: '20px',
-    maxWidth: '600px',
-    margin: '0 auto',
+  },
+  curvedShape: {
+    position: 'absolute',
+    top: '0',
+    left: '0',
+    width: '150px',
+    height: '150px',
+    background: '#ff2770',
+    borderRadius: '50%',
+    transform: 'translate(-50%, -50%)',
+  },
+  curvedShape2: {
+    position: 'absolute',
+    bottom: '0',
+    right: '0',
+    width: '150px',
+    height: '150px',
+    background: '#ff2770',
+    borderRadius: '50%',
+    transform: 'translate(50%, 50%)',
+    
   },
   title: {
+    fontSize: '32px',
+    color: '#fff',
+    textAlign: 'center',
+    marginTop: '150px',
+    marginBottom:"20px"
+
+  },
+  imageContainer: {
+    display: 'flex',
+    justifyContent: 'center',
     marginBottom: '20px',
+  },
+  image: {
+    width: '100px',
+    height: '100px',
+    borderRadius: '50%',
+    objectFit: 'cover',
+    border: '2px solid #ff2770',
+  },
+  content: {
+    maxWidth: '800px',
+    margin: '0 auto',
+    overflowY: 'auto',
+    padding: '20px',
+  },
+  profileInfo: {
+    color: '#fff',
+    textAlign: 'center',
   },
   form: {
     display: 'flex',
     flexDirection: 'column',
+    maxWidth: '600px',
+    margin: '0 auto',
   },
   formGroup: {
-    marginBottom: '15px',
+    marginBottom: '20px',
+    position: 'relative',
   },
   label: {
-    marginBottom: '5px',
-    fontWeight: 'bold',
+    fontSize: '18px',
+    color: '#fff',
+    marginBottom: '10px',
+    display: 'block',
   },
   input: {
-    padding: '10px',
+    padding: '15px',
     fontSize: '16px',
+    borderRadius: '6px',
+    border: '2px solid #fff',
+    width: '100%',
+    backgroundColor: 'transparent',
+    color: '#fff',
+    transition: 'border-color 0.3s',
   },
   button: {
-    padding: '10px 15px',
+    padding: '12px 20px',
     fontSize: '16px',
-    marginRight: '10px',
+    border: 'none',
+    borderRadius: '6px',
+    backgroundColor: '#ff2770',
+    color: '#fff',
+    cursor: 'pointer',
+    margin: '5px',
+    transition: 'background-color 0.3s',
   },
   error: {
     color: 'red',
     marginBottom: '15px',
+    textAlign: 'center',
+  },
+  loading: {
+    color: '#fff',
+    textAlign: 'center',
   },
 };
 

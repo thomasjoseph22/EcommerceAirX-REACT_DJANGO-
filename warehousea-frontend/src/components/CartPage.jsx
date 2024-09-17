@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { Container, Table, Button } from 'react-bootstrap';
+import { Button } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
+import Footer from '../components/Footer';
+import CommonNavbar from '../components/CommonNavbar'; // Import the CommonNavbar component
 
 const CartPage = () => {
     const [cart, setCart] = useState(null);
@@ -65,85 +67,127 @@ const CartPage = () => {
     }, 0) : 0;
 
     if (loading) {
-        return <div>Loading...</div>;
+        return <div style={styles.loading}>Loading...</div>;
     }
 
     if (error) {
-        return <div style={{ color: 'red' }}>{error}</div>;
+        return <div style={styles.error}>{error}</div>;
     }
 
     return (
-        <Container
-            className="mt-4"
-            style={{
-                backgroundImage: 'url(https://images.inc.com/uploaded_files/image/1920x1080/getty_769800477_2000133320009280304_361867.jpg)',
-                backgroundSize: 'cover',
-                backgroundPosition: 'center',
-                backgroundRepeat: 'no-repeat',
-                minHeight: '100vh',
-                padding: '20px',
-                color: 'white'
-            }}
-        >
-            <h1 className="mb-4">Your Cart</h1>
-            <Table
-                striped
-                bordered
-                hover
-                variant="dark"
-                style={{
-                    backgroundColor: 'rgba(0, 0, 0, 0.8)', // Semi-transparent black background
-                    color: 'white'
-                }}
-            >
-                <thead>
-                    <tr>
-                        <th>#</th>
-                        <th>Name</th>
-                        <th>Quantity</th>
-                        <th>Price</th>
-                        <th>Action</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {cart && cart.items.length > 0 ? (
-                        cart.items.map((item, index) => {
-                            const product = item.product;
-                            const productPrice = parseFloat(product.price) || 0;
-                            return (
-                                <tr key={item.id}>
-                                    <td>{index + 1}</td>
-                                    <td>{product.name}</td>
-                                    <td>{item.quantity}</td>
-                                    <td>${productPrice.toFixed(2)}</td>
-                                    <td>
-                                        <Button
-                                            variant="danger"
-                                            onClick={() => handleRemoveFromCart(product.id)}
-                                        >
-                                            Remove
-                                        </Button>
-                                    </td>
-                                </tr>
-                            );
-                        })
-                    ) : (
+        <>
+            <CommonNavbar />
+            <div style={styles.pageContainer}>
+                <h1 style={styles.title}>Your Cart</h1>
+                <table style={styles.table}>
+                    <thead>
                         <tr>
-                            <td colSpan="5" className="text-center">No items in cart</td>
+                            <th>#</th>
+                            <th>Name</th>
+                            <th>Quantity</th>
+                            <th>Price</th>
+                            <th>Action</th>
                         </tr>
-                    )}
-                </tbody>
-            </Table>
-            {cart && cart.items.length > 0 && (
-                <>
-                    <h2>Total Price: ${totalPrice.toFixed(2)}</h2>
-                    <Button variant="primary" onClick={() => navigate(`/customer/checkout?cartId=${cartId}`)}>
-                        Proceed to Checkout
-                    </Button>
-                </>
-            )}
-        </Container>
+                    </thead>
+                    <tbody>
+                        {cart && cart.items.length > 0 ? (
+                            cart.items.map((item, index) => {
+                                const product = item.product;
+                                const productPrice = parseFloat(product.price) || 0;
+                                return (
+                                    <tr key={item.id}>
+                                        <td>{index + 1}</td>
+                                        <td>{product.name}</td>
+                                        <td>{item.quantity}</td>
+                                        <td>${productPrice.toFixed(2)}</td>
+                                        <td>
+                                            <Button
+                                                variant="danger"
+                                                onClick={() => handleRemoveFromCart(product.id)}
+                                                style={styles.button}
+                                            >
+                                                Remove
+                                            </Button>
+                                        </td>
+                                    </tr>
+                                );
+                            })
+                        ) : (
+                            <tr>
+                                <td colSpan="5" style={styles.noItems}>No items in cart</td>
+                            </tr>
+                        )}
+                    </tbody>
+                </table>
+                {cart && cart.items.length > 0 && (
+                    <>
+                        <h2 style={styles.totalPrice}>Total Price: ${totalPrice.toFixed(2)}</h2>
+                        <Button
+                            variant="primary"
+                            onClick={() => navigate(`/customer/checkout?cartId=${cartId}`)}
+                            style={styles.checkoutButton}
+                        >
+                            Proceed to Checkout
+                        </Button>
+                    </>
+                )}
+            </div>
+            <Footer />
+        </>
     );
+};
+
+const styles = {
+    pageContainer: {
+        backgroundColor: '#25252b',
+        color: '#fff',
+        padding: '20px',
+        borderRadius: '10px',
+        boxShadow: '0 0 15px rgba(0, 0, 0, 0.5)',
+        minHeight: 'calc(100vh - 60px)', // Subtract the height of the footer
+        margin: '0 auto',
+        maxWidth: '1200px',
+        position: 'relative', // Ensure the footer is positioned correctly
+        paddingBottom: '60px' // Add padding to prevent overlap with the footer
+    },
+    title: {
+        textAlign: 'center',
+        marginBottom: '2rem',
+        fontSize: '2rem',
+        color: '#ff2770'
+    },
+    table: {
+        backgroundColor: '#333',
+        color: '#fff',
+        width: '100%',
+        borderCollapse: 'collapse',
+        boxShadow: '0 0 10px rgba(0, 0, 0, 0.5)'
+    },
+    button: {
+        margin: '0 auto',
+        display: 'block'
+    },
+    noItems: {
+        textAlign: 'center',
+        color: '#ff2770'
+    },
+    totalPrice: {
+        textAlign: 'center',
+        marginTop: '1rem',
+        fontSize: '1.5rem'
+    },
+    checkoutButton: {
+        display: 'block',
+        margin: '1rem auto'
+    },
+    loading: {
+        textAlign: 'center',
+        color: '#fff'
+    },
+    error: {
+        textAlign: 'center',
+        color: '#ff2770'
+    }
 };
 
 export default CartPage;

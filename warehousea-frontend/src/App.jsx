@@ -23,6 +23,9 @@ import AdminUserManagement from './components/AdminUserManagement';
 import OrdersPage from './components/OrdersPage';
 import UserOrdersPage from './components/UserOrdersPage';
 import Home from './components/Home';
+import AdminDashboard from './components/AdminDashboard';
+import DeliveryBoyList from './components/DeliveryBoyList';
+import CustomerListPage from './components/CustomerListPage';
 
 
 
@@ -38,22 +41,25 @@ function App() {
             <Route path="/admin/register" element={<AdminRegister />} />
             <Route path="/admin/products" element={<AdminProducts />} />
             <Route path="/admin/products/add" element={<AddProduct />} />
-            <Route path="/admin/users" element={<ProtectedRoute element={AdminUserManagement} />} />
-            <Route path="/admin/orders" element={<ProtectedRoute element={OrdersPage} />} />
+            <Route path="/admin/customers" element={<CustomerListPage />} />
+            <Route path="/admin/deliveryboys" element={<DeliveryBoyList />}  />
+            <Route path="/admin/dashboard" element={<AdminDashboard />} />
+            <Route path="/admin/users" element={<AdminUserManagement />}  />
+            <Route path="/admin/orders" element={<OrdersPage />}  />
             <Route path="/admin/products/edit/:productId" element={<EditProduct />} />
             <Route path="/customer/register" element={<CustomerRegistration />} />
             <Route path="/customer/login" element={<CustomerLogin />} />
-            <Route path="/customer/dashboard" element={<ProtectedRoute element={CustomerDashboard} />} />
-            <Route path="/users/orders" element={<ProtectedRoute element={UserOrdersPage} />} />
-            <Route path="/product/:id" element={<ProtectedRoute element={ProductPreviewPage} />} />
-            <Route path="/customer/cart" element={<ProtectedRoute element={CartPage} />} />
-            <Route path="/customer/checkout" element={<ProtectedRoute element={CheckoutPage} />} />
-            <Route path="/customer/profile" element={<ProtectedRoute element={CustomerProfile} />} />
-            <Route path="/delivery/register" element={<DeliveryBoyRegister />} />
+            <Route path="/customer/dashboard" element={<CustomerDashboard />}  />
+            <Route path="/users/orders" element={<UserOrdersPage />}  />
+            <Route path="/product/:id" element={<ProductPreviewPage />}  />
+            <Route path="/customer/cart" element={<CartPage />}  />
+            <Route path="/customer/checkout" element={<CheckoutPage/>}/>
+            <Route path="/customer/profile" element={<CustomerProfile/>}/>
+            <Route path="/deliveryboy/register" element={<DeliveryBoyRegister />} />
             <Route path="/deliveryboy/login" element={<DeliveryBoyLogin />} />
-            <Route path="/deliveryboy/dashboard" element={<ProtectedRoute element={DeliveryBoyDashboard} />} />
-            <Route path="/deliveryboy/profile" element={<ProtectedRoute element={DeliveryBoyProfile} />} />
-            <Route path="/deliveryboy/orders" element={<ProtectedRoute element={DeliveryBoyOrders} />} />
+            <Route path="/deliveryboy/dashboard" element={<DeliveryBoyDashboard />}  />
+            <Route path="/deliveryboy/profile" element={<DeliveryBoyProfile />}  />
+            <Route path="/deliveryboy/orders" element={<DeliveryBoyOrders />}  />
 
             
           </Routes>

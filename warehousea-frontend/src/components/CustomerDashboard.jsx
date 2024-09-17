@@ -1,13 +1,15 @@
 import React, { useEffect, useState, useContext } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { Container, Card, Button, Navbar, Nav } from 'react-bootstrap';
+import { Container, Card, Button } from 'react-bootstrap';
 import { AuthContext } from '../AuthContext';
+import CommonNavbar from '../components/CommonNavbar'; // Import the CommonNavbar component
+import Footer from '../components/Footer';
 import '../styles.css';
 import '../axiosConfig';
 
 const CustomerDashboard = () => {
-    const { username, token, logout } = useContext(AuthContext);
+    const { token } = useContext(AuthContext);
     const [products, setProducts] = useState([]);
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     const navigate = useNavigate();
@@ -18,7 +20,7 @@ const CustomerDashboard = () => {
                 setIsLoggedIn(true);
             } else {
                 setIsLoggedIn(false);
-                navigate('/login');
+                navigate('');
             }
         };
         checkAuthentication();
@@ -45,58 +47,34 @@ const CustomerDashboard = () => {
     }, [token]);
 
     return (
-        <div className="customer-dashboard">
-            <Navbar bg="dark" variant="dark" expand="lg">
-                <Container>
-                    <Navbar.Brand href="#home">Customer Dashboard</Navbar.Brand>
-                    <Nav className="ml-auto">
-                        {isLoggedIn && (
-                            <>
-                                <Nav.Item>
-                                    <Nav.Link href="#profile">Welcome, {username}</Nav.Link>
-                                </Nav.Item>
-                                <Nav.Item>
-                                    <Button variant="outline-light" onClick={logout}>Logout</Button>
-                                </Nav.Item>
-                                <Nav.Item>
-                                    <Button variant="outline-light" onClick={() => navigate('/customer/profile')}>
-                                        View Profile
-                                    </Button>
-                                </Nav.Item>
-                                <Nav.Item>
-                                    <Link to="/users/orders" className="nav-link">My Orders</Link>
-                                </Nav.Item>
-                            </>
-                        )}
-                        <Nav.Item>
-                            <Link to="/customer/cart" className="nav-link">View Cart</Link>
-                        </Nav.Item>
-                    </Nav>
-                </Container>
-            </Navbar>
-            <Container>
-                <h1>Customer Dashboard</h1>
-                <p><strong>Logged in as:</strong> {username}</p>
-                <p><strong>Token:</strong> {token}</p>
-                <div className="card-container" style={{ display: 'flex', flexWrap: 'wrap', gap: '20px' }}>
+        <div style={{ backgroundColor: '#1b1b1b', minHeight: '100vh', color: '#fff' }}>
+            <CommonNavbar /> {/* Use the CommonNavbar component */}
+            <Container style={{ padding: '20px' }}>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '20px', justifyContent: 'center' }}>
                     {products.map(product => (
-                        <div key={product.id} className="card-item">
-                            <Card style={{ width: '18rem', backgroundColor: '#000', color: '#fff' }}>
+                        <div key={product.id} style={{ width: '18rem' }}>
+                            <Card style={{
+                                backgroundColor: '#2a2a2e',
+                                color: '#fff',
+                                border: '2px solid #ff2770',
+                                boxShadow: '0 0 25px #ff2770',
+                                borderRadius: '10px',
+                            }}>
                                 <Card.Img
                                     variant="top"
                                     src={product.images && product.images.length > 0 ? product.images[0].image_url : 'https://via.placeholder.com/150'}
                                     alt={`Product Image ${product.id}`}
-                                    style={{ height: '250px', width: '100%', objectFit: 'cover' }}
+                                    style={{ height: '250px', width: '100%', objectFit: 'cover', borderBottom: '2px solid #ff2770' }}
                                 />
-                                <Card.Body style={{ padding: '15px' }}>
-                                    <Card.Title>{product.name}</Card.Title>
+                                <Card.Body style={{ padding: '15px', textAlign: 'center' }}>
+                                    <Card.Title style={{ marginBottom: '10px' }}>{product.name}</Card.Title>
                                     <Card.Text>
                                         <strong>Price:</strong> ${product.price}
                                     </Card.Text>
                                     <Card.Text>
                                         <strong>Quantity:</strong> {product.quantity}
                                     </Card.Text>
-                                    <Button variant="primary" onClick={() => navigate(`/product/${product.id}`)}>
+                                    <Button variant="outline-light" onClick={() => navigate(`/product/${product.id}`)} style={{ width: '100%' }}>
                                         Preview
                                     </Button>
                                 </Card.Body>
@@ -105,6 +83,7 @@ const CustomerDashboard = () => {
                     ))}
                 </div>
             </Container>
+            <Footer /> {/* Include the Footer component */}
         </div>
     );
 };

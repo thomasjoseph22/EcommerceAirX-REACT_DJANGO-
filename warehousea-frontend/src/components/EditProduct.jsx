@@ -14,25 +14,34 @@ const EditProduct = () => {
     });
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
+    const [loading, setLoading] = useState(true);
+
+    // Retrieve the token from localStorage
+    const token = localStorage.getItem('token');
 
     useEffect(() => {
         const fetchProduct = async () => {
             try {
-                const response = await axios.get(`http://localhost:8000/api/products/${productId}/`);
-                console.log(response.data); // Log the response to see the data
+                const response = await axios.get(`http://localhost:8000/api/products/${productId}/`, {
+                    headers: {
+                        'Authorization': `Token ${token}` // Include the token in the request headers
+                    }
+                });
                 const { name, description, price, quantity, images } = response.data;
                 setFormData({ name, description, price, quantity, images });
+                setError('');
             } catch (error) {
-                console.error('Failed to fetch product:', error);
+                setError('Failed to fetch product details.');
+                if (error.response && error.response.status === 401) {
+                    localStorage.removeItem('authToken'); // Clear invalid token
+                    navigate('/login'); // Redirect to login page
+                }
+            } finally {
+                setLoading(false); // Stop loading state
             }
         };
         fetchProduct();
-    }, [productId]);
-    
-
-    useEffect(() => {
-        console.log(formData); // Check formData after setting it
-    }, [formData]);
+    }, [productId, token, navigate]);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -67,6 +76,7 @@ const EditProduct = () => {
             await axios.put(`http://localhost:8000/api/products/${productId}/edit/`, productData, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
+                    'Authorization': `Token ${token}`
                 },
             });
             setSuccess('Product updated successfully!');
@@ -80,43 +90,51 @@ const EditProduct = () => {
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
-        minHeight: '100vh',
-        backgroundImage: `url('https://media.licdn.com/dms/image/D5612AQGGgw-PAVlKSw/article-cover_image-shrink_720_1280/0/1698335366517?e=2147483647&v=beta&t=8bK3HY1ITN3CdLXrcdGBaElD_E6P6kR21RzrZ3BTxzI')`,
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
+        height: '100vh',
+        background: '#25252b',
+        fontFamily: 'Poppins, sans-serif',
     };
 
     const formStyles = {
-        backgroundColor: 'rgba(255, 255, 255, 0.8)',
-        padding: '20px',
+        position: 'relative',
+        width: '500px',
+        padding: '30px',
+        backgroundColor: '#333',
         borderRadius: '10px',
-        width: '400px',
-        boxShadow: '0px 0px 10px rgba(0, 0, 0, 0.1)',
+        border: '2px solid #007bff',
+        boxShadow: '0 0 25px #007bff',
+        color: '#fff',
     };
 
     const labelStyles = {
+        fontSize: '16px',
+        color: '#fff',
+        marginBottom: '10px',
         display: 'block',
-        marginBottom: '8px',
-        fontWeight: 'bold',
     };
 
     const inputStyles = {
         width: '100%',
         padding: '10px',
-        marginBottom: '15px',
-        borderRadius: '5px',
-        border: '1px solid #ccc',
+        marginBottom: '20px',
+        backgroundColor: 'transparent',
+        border: 'none',
+        borderBottom: '2px solid #fff',
+        color: '#fff',
+        fontSize: '16px',
+        outline: 'none',
     };
 
     const buttonStyles = {
         width: '100%',
-        padding: '10px',
-        backgroundColor: '#4CAF50',
+        padding: '12px',
+        backgroundColor: '#007bff',
         color: 'white',
         border: 'none',
         borderRadius: '5px',
         cursor: 'pointer',
-        fontSize: '16px',
+        fontSize: '18px',
+        transition: 'background-color 0.3s',
     };
 
     const errorStyles = {
@@ -129,66 +147,61 @@ const EditProduct = () => {
         marginBottom: '15px',
     };
 
+    if (loading) {
+        return <div>Loading...</div>;
+    }
+
     return (
         <div style={pageStyles}>
             <div style={formStyles}>
-                <h1>Edit Product</h1>
+                <h2>Edit Product</h2>
                 {error && <p style={errorStyles}>{error}</p>}
                 {success && <p style={successStyles}>{success}</p>}
                 <form onSubmit={handleSubmit}>
-                    <div>
-                        <label style={labelStyles}>Name:</label>
-                        <input
-                            type="text"
-                            name="name"
-                            value={formData.name}
-                            onChange={handleChange}
-                            required
-                            style={inputStyles}
-                        />
-                    </div>
-                    <div>
-                        <label style={labelStyles}>Description:</label>
-                        <textarea
-                            name="description"
-                            value={formData.description}
-                            onChange={handleChange}
-                            required
-                            style={inputStyles}
-                        />
-                    </div>
-                    <div>
-                        <label style={labelStyles}>Price:</label>
-                        <input
-                            type="number"
-                            name="price"
-                            value={formData.price}
-                            onChange={handleChange}
-                            required
-                            style={inputStyles}
-                        />
-                    </div>
-                    <div>
-                        <label style={labelStyles}>Quantity:</label>
-                        <input
-                            type="number"
-                            name="quantity"
-                            value={formData.quantity}
-                            onChange={handleChange}
-                            required
-                            style={inputStyles}
-                        />
-                    </div>
-                    <div>
-                        <label style={labelStyles}>Images:</label>
-                        <input
-                            type="file"
-                            name="images"
-                            multiple
-                            onChange={handleFileChange}
-                            style={inputStyles}
-                        />
-                    </div>
+                    <label style={labelStyles}>Name</label>
+                    <input
+                        type="text"
+                        name="name"
+                        value={formData.name}
+                        onChange={handleChange}
+                        style={inputStyles}
+                    />
+
+                    <label style={labelStyles}>Description</label>
+                    <textarea
+                        name="description"
+                        value={formData.description}
+                        onChange={handleChange}
+                        style={inputStyles}
+                    />
+
+                    <label style={labelStyles}>Price</label>
+                    <input
+                        type="number"
+                        name="price"
+                        value={formData.price}
+                        onChange={handleChange}
+                        style={inputStyles}
+                    />
+
+                    <label style={labelStyles}>Quantity</label>
+                    <input
+                        type="number"
+                        name="quantity"
+                        value={formData.quantity}
+                        onChange={handleChange}
+                        style={inputStyles}
+                    />
+
+                    <label style={labelStyles}>Images</label>
+                    <input
+                        type="file"
+                        name="images"
+                        multiple
+                        onChange={handleFileChange}
+                        style={inputStyles}
+                    />
+
                     <button type="submit" style={buttonStyles}>Update Product</button>
                 </form>
             </div>

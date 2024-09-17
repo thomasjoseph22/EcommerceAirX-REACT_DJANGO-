@@ -1,35 +1,37 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import AdminNavbar from './AdminNavbar';
 
 const AdminProducts = () => {
     const [products, setProducts] = useState([]);
     const navigate = useNavigate();
 
     useEffect(() => {
-        // Check if the user is authenticated and is an admin
         const token = localStorage.getItem('token');
         const isAdmin = localStorage.getItem('isAdmin') === 'true';
 
+        // Redirect to login if no token or not admin
         if (!token || !isAdmin) {
-            // Redirect to login page if not authenticated or not an admin
             navigate('/admin/login');
-        } else {
-            // Fetch products if authenticated and is an admin
-            const fetchProducts = async () => {
-                try {
-                    const response = await axios.get('http://localhost:8000/api/products/', {
-                        headers: {
-                            Authorization: `Token ${token}`,
-                        },
-                    });
-                    setProducts(response.data);
-                } catch (error) {
-                    console.error('Failed to fetch products:', error);
-                }
-            };
-            fetchProducts();
+            return;
         }
+
+        // Fetch products if token is valid and user is admin
+        const fetchProducts = async () => {
+            try {
+                const response = await axios.get('http://localhost:8000/api/products/', {
+                    headers: {
+                        Authorization: `Token ${token}`,
+                    },
+                });
+                setProducts(response.data);
+            } catch (error) {
+                console.error('Failed to fetch products:', error);
+            }
+        };
+
+        fetchProducts();
     }, [navigate]);
 
     const handleAddProduct = () => {
@@ -60,121 +62,143 @@ const AdminProducts = () => {
     };
 
     return (
-        <div
-            style={{
-                padding: '20px',
-                backgroundImage: 'url(https://pbs.twimg.com/media/GT1MNEQWUAAxudv.jpg:large)',
-                backgroundSize: 'cover',
-                minHeight: '100vh',
-                color: '#fff',
-            }}
-        >
-            <nav style={{ backgroundColor: '#333', padding: '10px 20px' }}>
-                <ul style={{ listStyle: 'none', display: 'flex', justifyContent: 'space-between', margin: 0, padding: 0 }}>
-                    <li style={{ marginRight: '20px' }}>
-                        <a href="/admin/products" style={{ color: '#fff', textDecoration: 'none' }}>Products</a>
-                    </li>
-                    <li style={{ marginRight: '20px' }}>
-                        <a href="/admin/users" style={{ color: '#fff', textDecoration: 'none' }}>Users</a>
-                    </li>
-                    <li style={{ marginRight: '20px' }}>
-                        <a href="/admin/orders" style={{ color: '#fff', textDecoration: 'none' }}>Orders</a>
-                    </li>
-                    <li>
-                        <button
-                            onClick={handleLogout}
-                            style={{
-                                padding: '5px 10px',
-                                backgroundColor: '#dc3545',
-                                color: '#fff',
-                                border: 'none',
-                                borderRadius: '3px',
-                                cursor: 'pointer',
-                            }}
-                        >
-                            Logout
-                        </button>
-                    </li>
-                </ul>
-            </nav>
-            <h1>Admin Products</h1>
-            <button
-                onClick={handleAddProduct}
-                style={{
-                    padding: '10px 20px',
-                    backgroundColor: '#007bff',
-                    color: '#fff',
-                    border: 'none',
-                    borderRadius: '5px',
-                    cursor: 'pointer',
-                    marginBottom: '20px',
-                }}
-            >
-                Add Product
-            </button>
-            <div style={{ overflowX: 'auto' }}>
-                <table style={{ width: '100%', borderCollapse: 'collapse', backgroundColor: 'rgba(0, 0, 0, 0.7)' }}>
-                    <thead>
-                        <tr>
-                            <th style={{ border: '1px solid #ccc', padding: '10px' }}>Name</th>
-                            <th style={{ border: '1px solid #ccc', padding: '10px' }}>Price</th>
-                            <th style={{ border: '1px solid #ccc', padding: '10px' }}>Quantity</th>
-                            <th style={{ border: '1px solid #ccc', padding: '10px' }}>Images</th>
-                            <th style={{ border: '1px solid #ccc', padding: '10px' }}>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {products.map(product => (
-                            <tr key={product.id}>
-                                <td style={{ border: '1px solid #ccc', padding: '10px' }}>{product.name}</td>
-                                <td style={{ border: '1px solid #ccc', padding: '10px' }}>${product.price}</td>
-                                <td style={{ border: '1px solid #ccc', padding: '10px' }}>{product.quantity}</td>
-                                <td style={{ border: '1px solid #ccc', padding: '10px' }}>
-                                    {product.images && product.images.map((image, index) => (
-                                        <img
-                                            key={index}
-                                            src={image.image_url}
-                                            alt={`Product Image ${index + 1}`}
-                                            style={{ width: '50px', height: '50px', marginRight: '5px' }}
-                                        />
-                                    ))}
-                                </td>
-                                <td style={{ border: '1px solid #ccc', padding: '10px' }}>
-                                    <button
-                                        onClick={() => handleEditProduct(product.id)}
-                                        style={{
-                                            padding: '5px 10px',
-                                            marginRight: '5px',
-                                            backgroundColor: '#ffc107',
-                                            color: '#fff',
-                                            border: 'none',
-                                            borderRadius: '3px',
-                                            cursor: 'pointer',
-                                        }}
-                                    >
-                                        Edit
-                                    </button>
-                                    <button
-                                        onClick={() => handleDeleteProduct(product.id)}
-                                        style={{
-                                            padding: '5px 10px',
-                                            backgroundColor: '#dc3545',
-                                            color: '#fff',
-                                            border: 'none',
-                                            borderRadius: '3px',
-                                            cursor: 'pointer',
-                                        }}
-                                    >
-                                        Delete
-                                    </button>
-                                </td>
+        <div style={styles.container}>
+            <AdminNavbar style={styles.navbar} />
+            <div style={styles.mainContent}>
+                <h1 style={styles.heading}>Admin Products</h1>
+                <button
+                    onClick={handleAddProduct}
+                    style={styles.addButton}
+                >
+                    Add Product
+                </button>
+                <div style={styles.tableContainer}>
+                    <table style={styles.table}>
+                        <thead>
+                            <tr>
+                                {['Name', 'Price', 'Quantity', 'Images', 'Actions'].map(header => (
+                                    <th key={header} style={styles.tableHeader}>{header}</th>
+                                ))}
                             </tr>
-                        ))}
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            {products.map(product => (
+                                <tr key={product.id}>
+                                    <td style={styles.tableCell}>{product.name}</td>
+                                    <td style={styles.tableCell}>${product.price}</td>
+                                    <td style={styles.tableCell}>{product.quantity}</td>
+                                    <td style={styles.tableCell}>
+                                        {product.images && product.images.map((image, index) => (
+                                            <img
+                                                key={index}
+                                                src={image.image_url}
+                                                alt={`Product Image ${index + 1}`}
+                                                style={styles.productImage}
+                                            />
+                                        ))}
+                                    </td>
+                                    <td style={styles.tableCell}>
+                                        <button
+                                            onClick={() => handleEditProduct(product.id)}
+                                            style={styles.editButton}
+                                        >
+                                            Edit
+                                        </button>
+                                        <button
+                                            onClick={() => handleDeleteProduct(product.id)}
+                                            style={styles.deleteButton}
+                                        >
+                                            Delete
+                                        </button>
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     );
+};
+
+const styles = {
+    container: {
+        padding: '20px',
+        background: 'linear-gradient(45deg, #25252b, #ff2770)',
+        minHeight: '100vh',
+        color: '#fff',
+        position: 'relative',
+        overflow: 'hidden'
+    },
+    navbar: {
+        position: 'fixed',
+        top: '0',
+        width: '100%',
+        zIndex: '1000'
+    },
+    mainContent: {
+        marginTop: '60px' // Adjust margin to account for fixed Navbar
+    },
+    heading: {
+        fontSize: '32px',
+        textAlign: 'center',
+        marginBottom: '20px'
+    },
+    addButton: {
+        padding: '10px 20px',
+        backgroundColor: '#ff2770',
+        color: '#fff',
+        border: 'none',
+        borderRadius: '40px',
+        cursor: 'pointer',
+        marginBottom: '20px',
+        fontSize: '16px',
+        fontWeight: '600'
+    },
+    tableContainer: {
+        overflowX: 'auto' // Add scrollable container
+    },
+    table: {
+        width: '100%',
+        borderCollapse: 'collapse',
+        backgroundColor: '#25252b',
+        color: '#fff',
+        boxShadow: '0 4px 8px rgba(0,0,0,0.2)',
+        borderRadius: '8px',
+        minWidth: '800px' // Set minimum width to prevent table shrinking
+    },
+    tableHeader: {
+        border: '1px solid #fff',
+        padding: '15px',
+        backgroundColor: '#ff2770',
+        textAlign: 'left'
+    },
+    tableCell: {
+        border: '1px solid #fff',
+        padding: '15px'
+    },
+    productImage: {
+        width: '50px',
+        height: '50px',
+        marginRight: '5px'
+    },
+    editButton: {
+        padding: '5px 10px',
+        marginRight: '5px',
+        backgroundColor: '#ffc107',
+        color: '#fff',
+        border: 'none',
+        borderRadius: '3px',
+        cursor: 'pointer'
+    },
+    deleteButton: {
+        padding: '5px 10px',
+        backgroundColor: '#dc3545',
+        color: '#fff',
+        border: 'none',
+        borderRadius: '3px',
+        cursor: 'pointer'
+    }
 };
 
 export default AdminProducts;

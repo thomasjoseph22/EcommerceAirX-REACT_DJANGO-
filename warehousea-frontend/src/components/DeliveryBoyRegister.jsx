@@ -10,7 +10,6 @@ function DeliveryBoyRegister() {
   const [loading, setLoading] = useState(false);
 
   const validateForm = () => {
-    console.log('Validating form...');
     const newErrors = {};
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     const panCardRegex = /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/;
@@ -23,147 +22,187 @@ function DeliveryBoyRegister() {
     }
 
     setErrors(newErrors);
-    console.log('Validation errors:', newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log('Form submitted');
     if (!validateForm()) return;
 
     setLoading(true);
-    console.log('Sending request to server...');
     try {
       const response = await axios.post('http://localhost:8000/api/accounts/deliveryboy/register/', {
         username,
         email,
         pan_card: panCard,
       });
-      console.log('Response from server:', response);
       setSuccess('Registration successful. Please check your email for your password.');
       setUsername('');
       setEmail('');
       setPanCard('');
       setErrors({});
     } catch (error) {
-      console.error('Error during registration:', error);
       const errorMsg = error.response?.data?.non_field_errors?.[0] || 'Email already registered or other error';
       setErrors({ general: errorMsg });
     } finally {
       setLoading(false);
-      console.log('Request completed');
     }
   };
 
+  // Inline styles based on the DeliveryBoyLogin component
+  const pageStyle = {
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    minHeight: '100vh',
+    backgroundColor: '#1c1c1c',
+  };
+
+  const containerStyle = {
+    position: 'relative',
+    width: '750px',
+    height: '600px',
+    border: '2px solid #FFD700', // Yellow border
+    boxShadow: '0 0 25px #FFD700', // Yellow shadow
+    overflow: 'hidden',
+    display: 'flex',
+    backgroundColor: '#25252b', // Dark background for the form
+  };
+
+  const formBoxStyle = {
+    position: 'absolute',
+    top: '0',
+    width: '50%',
+    height: '100%',
+    display: 'flex',
+    justifyContent: 'center',
+    flexDirection: 'column',
+    padding: '0 40px',
+  };
+
+  const infoContentStyle = {
+    position: 'absolute',
+    top: '0',
+    height: '100%',
+    width: '50%',
+    display: 'flex',
+    justifyContent: 'center',
+    flexDirection: 'column',
+    padding: '0 40px 60px 150px',
+    right: '0',
+    textAlign: 'right',
+    color: '#fff',
+  };
+
+  const h2Style = {
+    fontSize: '32px',
+    marginBottom: '20px',
+    color: '#fff',
+  };
+
+  const inputStyle = {
+    width: '100%',
+    padding: '10px',
+    borderRadius: '5px',
+    border: 'none',
+    borderBottom: '2px solid #fff',
+    background: 'transparent',
+    color: '#fff',
+    fontSize: '16px',
+    marginBottom: '20px',
+  };
+
+  const inputFocusStyle = {
+    borderBottom: '2px solid #FFD700', // Yellow underline on focus
+  };
+
+  const buttonStyle = {
+    width: '100%',
+    padding: '10px',
+    borderRadius: '5px',
+    backgroundColor: '#FFD700', // Yellow button
+    color: '#000',
+    fontWeight: '600',
+    fontSize: '16px',
+    border: 'none',
+    cursor: 'pointer',
+  };
+
+  const errorStyle = {
+    color: 'red',
+    marginTop: '10px',
+  };
+
+  const successStyle = {
+    color: 'green',
+    marginTop: '10px',
+  };
+
+  const pStyle = {
+    fontSize: '16px',
+    color: '#fff',
+  };
+
   return (
-    <div style={{
-      backgroundImage: 'url(https://th.bing.com/th/id/R.2e505f767e171f45b4dabe2d3fde5c65?rik=2MBE6fcXTrILNw&pid=ImgRaw&r=0)',
-      backgroundSize: 'cover',
-      backgroundPosition: 'center',
-      height: '100vh',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      padding: '20px',
-    }}>
-      <form onSubmit={handleSubmit} style={{
-        backgroundColor: 'rgba(0, 0, 0, 0.7)',
-        padding: '30px',
-        borderRadius: '10px',
-        color: '#fff',
-        width: '100%',
-        maxWidth: '400px',
-        boxShadow: '0px 0px 10px rgba(0, 0, 0, 0.5)',
-        textAlign: 'left',
-      }}>
-        <h2 style={{ marginBottom: '20px', textAlign: 'left' }}>Delivery Boy Registration</h2>
-
-        {/* Image added here */}
-        <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '20px' }}>
-          <img
-            src="https://i.pinimg.com/736x/a4/fb/1b/a4fb1be5fcf9b3cb7f7dd01f45f38edc.jpg"
-            alt="Delivery Boy"
-            style={{
-              width: '80px',
-              height: '80px',
-              borderRadius: '50%',
-              border: '2px solid #fff',
-            }}
-          />
+    <div style={pageStyle}>
+      <div style={containerStyle}>
+        {/* Registration Form */}
+        <div style={formBoxStyle}>
+          <h2 style={h2Style}>Register</h2>
+          <form onSubmit={handleSubmit}>
+            <div>
+              <input
+                type="text"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                required
+                placeholder="Username"
+                style={inputStyle}
+                onFocus={(e) => (e.target.style.borderBottom = inputFocusStyle.borderBottom)}
+                onBlur={(e) => (e.target.style.borderBottom = inputStyle.borderBottom)}
+              />
+            </div>
+            <div>
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                placeholder="Email"
+                style={inputStyle}
+                onFocus={(e) => (e.target.style.borderBottom = inputFocusStyle.borderBottom)}
+                onBlur={(e) => (e.target.style.borderBottom = inputStyle.borderBottom)}
+              />
+              {errors.email && <p style={errorStyle}>{errors.email}</p>}
+            </div>
+            <div>
+              <input
+                type="text"
+                value={panCard}
+                onChange={(e) => setPanCard(e.target.value)}
+                required
+                placeholder="PAN Card"
+                style={inputStyle}
+                onFocus={(e) => (e.target.style.borderBottom = inputFocusStyle.borderBottom)}
+                onBlur={(e) => (e.target.style.borderBottom = inputStyle.borderBottom)}
+              />
+              {errors.panCard && <p style={errorStyle}>{errors.panCard}</p>}
+            </div>
+            <button type="submit" style={buttonStyle}>
+              {loading ? 'Registering...' : 'Register'}
+            </button>
+            {errors.general && <p style={errorStyle}>{errors.general}</p>}
+            {success && <p style={successStyle}>{success}</p>}
+          </form>
         </div>
 
-        <div style={{ marginBottom: '15px' }}>
-          <label htmlFor="username" style={{ display: 'block', marginBottom: '5px' }}>Username:</label>
-          <input
-            id="username"
-            type="text"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            required
-            style={{
-              width: '100%',
-              padding: '10px',
-              border: '1px solid #ddd',
-              borderRadius: '5px',
-              boxSizing: 'border-box',
-            }}
-          />
+        {/* Welcome Section */}
+        <div style={infoContentStyle}>
+          <h2 style={h2Style}>WELCOME!</h2>
+          <p style={pStyle}>Join us to begin your journey as a delivery agent and explore new opportunities!</p>
+          <p style={{ color: '#FFD700' }}>Already a member? <a href="/customer/login" style={{ color: '#FFD700' }}>Login here</a></p>
         </div>
-
-        <div style={{ marginBottom: '15px' }}>
-          <label htmlFor="email" style={{ display: 'block', marginBottom: '5px' }}>Email:</label>
-          <input
-            id="email"
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-            style={{
-              width: '100%',
-              padding: '10px',
-              border: '1px solid #ddd',
-              borderRadius: '5px',
-              boxSizing: 'border-box',
-            }}
-          />
-          {errors.email && <p style={{ color: 'red', fontSize: '12px' }}>{errors.email}</p>}
-        </div>
-
-        <div style={{ marginBottom: '15px' }}>
-          <label htmlFor="panCard" style={{ display: 'block', marginBottom: '5px' }}>PAN Card Number:</label>
-          <input
-            id="panCard"
-            type="text"
-            value={panCard}
-            onChange={(e) => setPanCard(e.target.value)}
-            required
-            style={{
-              width: '100%',
-              padding: '10px',
-              border: '1px solid #ddd',
-              borderRadius: '5px',
-              boxSizing: 'border-box',
-            }}
-          />
-          {errors.panCard && <p style={{ color: 'red', fontSize: '12px' }}>{errors.panCard}</p>}
-        </div>
-
-        {errors.general && <p style={{ color: 'red', fontSize: '14px', marginBottom: '10px' }}>{errors.general}</p>}
-        {success && <p style={{ color: 'green', fontSize: '14px', marginBottom: '10px' }}>{success}</p>}
-
-        <button type="submit" style={{
-          width: '100%',
-          padding: '10px',
-          backgroundColor: '#007bff',
-          border: 'none',
-          borderRadius: '5px',
-          color: 'white',
-          cursor: 'pointer',
-        }}>
-          {loading ? 'Registering...' : 'Register'}
-        </button>
-      </form>
+      </div>
     </div>
   );
 }

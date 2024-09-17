@@ -13,15 +13,21 @@ const AdminRegister = () => {
         e.preventDefault();
         setSuccessMessage('');
         setErrorMessage('');
-
+    
         try {
             await axios.post('http://localhost:8000/api/accounts/admin/register/', formData);
             setSuccessMessage('Admin Registration Successful');
         } catch (error) {
-            setErrorMessage('There was an error registering the admin.');
-            console.error('Registration error:', error);
+            if (error.response && error.response.data) {
+                console.error('Registration error:', error.response.data);
+                setErrorMessage(`Error: ${JSON.stringify(error.response.data)}`);
+            } else {
+                setErrorMessage('There was an error registering the admin.');
+                console.error('Registration error:', error);
+            }
         }
     };
+    
 
     const pageStyle = {
         minHeight: '100vh',

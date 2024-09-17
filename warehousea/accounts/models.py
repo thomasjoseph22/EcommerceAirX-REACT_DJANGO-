@@ -17,6 +17,7 @@ class CustomUser(AbstractUser):
 # models.py
 class DeliveryBoy(CustomUser):
     Pan_card = models.CharField(max_length=12, unique=True, null=True)
+    is_delivery = models.BooleanField(default=True)
 
     class Meta:
         permissions = [

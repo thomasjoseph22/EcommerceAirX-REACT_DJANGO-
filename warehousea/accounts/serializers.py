@@ -13,6 +13,7 @@ from django.contrib.auth.password_validation import validate_password
 from rest_framework import serializers
 
 
+
 class DeliveryBoyProfileSerializer(serializers.ModelSerializer):
     old_password = serializers.CharField(write_only=True, required=False)
     new_password = serializers.CharField(write_only=True, required=False)
@@ -88,6 +89,7 @@ class UserSerializer(serializers.ModelSerializer):
 
     
 
+
     
 
 class LoginSerializer(serializers.Serializer):
@@ -126,7 +128,8 @@ class CustomerRegistrationSerializer(serializers.ModelSerializer):
             username=validated_data['username'],
             email=validated_data['email'],
             password=random_password,
-            pan_card=validated_data['pan_card']
+            pan_card=validated_data['pan_card'],
+            is_active=False
         )
 
         # Attempt to send email
@@ -153,14 +156,19 @@ class AdminSerializer(serializers.ModelSerializer):
         read_only_fields = ['id', 'is_staff']
 
     def create(self, validated_data):
-        user = CustomUser.objects.create_user(
-            username=validated_data['username'],
-            password=validated_data['password'],
-            email=validated_data['email']
-        )
-        user.is_staff = True
-        user.save()
-        return user
+        try:
+            user = CustomUser.objects.create_user(
+                username=validated_data['username'],
+                password=validated_data['password'],
+                email=validated_data['email']
+            )
+            user.is_staff = True
+            user.save()
+            return user
+        except Exception as e:
+            print(f"Error during user creation: {e}")
+            raise serializers.ValidationError("An error occurred while creating the user.")
+
 
 class DeliveryBoyRegistrationSerializer(serializers.ModelSerializer):
     pan_card = serializers.CharField(max_length=12, min_length=10)
@@ -188,6 +196,8 @@ class DeliveryBoyRegistrationSerializer(serializers.ModelSerializer):
             email=validated_data['email'],
             password=random_password,
             pan_card=validated_data['pan_card'],
+            is_delivery_boy=True,
+            is_active=False,
            
         )
 
