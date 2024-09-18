@@ -14,7 +14,7 @@ const Home = () => {
       <div style={{ ...styles.parallaxSection, ...styles.secondSection }}>
         <h1 style={styles.title}>Welcome Back, Customer!</h1>
         <div style={styles.buttonContainer}>
-          <Link to="/customer/login" style={{color:"whit"}}>Customer Login</Link>
+          <Link to="/customer/login" style={{color:"white",textDecorationLine:"none"}}>Login</Link>
         </div>
       </div>
     </div>

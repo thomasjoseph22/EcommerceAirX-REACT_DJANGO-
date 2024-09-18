@@ -223,7 +223,6 @@ const AdminLogin = () => {
                         color: '#fff',
                     }}>Manage your warehouse efficiently from here.</p>
                     <p><a href="/customer/login" style={{fontWeight:"bold",color:"#007bff",marginLeft:"100px",textDecoration:"none"}}>Customer</a></p>
-                    <p><a href="/deliveryboy/login" style={{fontWeight:"bold",color:"#007bff",marginLeft:"100px",textDecoration:"none"}}>Delivery</a></p>
                 </div>
             </div>
         </div>

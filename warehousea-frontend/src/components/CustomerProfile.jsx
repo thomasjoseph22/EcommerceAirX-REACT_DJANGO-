@@ -200,11 +200,11 @@ const styles = {
     height: '100vh',
     border: '2px solid #ff2770',
     boxShadow: '0 0 25px #ff2770',
-    overflow: 'hidden', // Prevent scrolling
     backgroundColor: '#25252b',
     borderRadius: '10px',
     padding: '20px',
     boxSizing: 'border-box', // Ensure padding is included in total height/width
+    overflow: 'auto', // Ensure padding is included in total height/width
   },
   curvedShape: {
     position: 'absolute',
@@ -250,7 +250,7 @@ const styles = {
     alignItems: 'center',
     maxWidth: '800px',
     margin: '0 auto',
-    overflow: 'hidden', // Prevent scrolling within content
+   // Prevent scrolling within content
   },
   profileInfo: {
     color: '#fff',
@@ -270,7 +270,7 @@ const styles = {
     fontSize: '18px',
     color: '#fff',
     marginBottom: '10px',
-    display: 'block',
+   
   },
   input: {
     padding: '15px',
