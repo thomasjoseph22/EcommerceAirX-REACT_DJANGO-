@@ -108,7 +108,7 @@ const AdminUserManagement = () => {
                                             onClick={() => toggleUserStatus(user.id, user.is_active)}
                                             style={user.is_active ? styles.buttonBlock : styles.buttonUnblock}
                                         >
-                                            {user.is_active ? 'Block' : 'Unblock'}
+                                            {user.is_active ? 'Active' : 'Inactive'}
                                         </button>
                                     </td>
                                 </tr>
